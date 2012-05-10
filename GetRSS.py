@@ -21,7 +21,6 @@ class GetRSS:
         page = urllib2.urlopen(req) #We are blocked from accessing feeds (detected as bot
         soupPage = soup(page)
         returnList = []
-        stringList = []
         unparsedList = soupPage.findAll('guid')
         for listelement in unparsedList:
 	        returnList.append(listelement.findAll(text=True))
