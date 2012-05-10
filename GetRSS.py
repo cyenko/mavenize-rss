@@ -1,7 +1,7 @@
 import AlchemyAPI,re,urllib2
 from bs4 import BeautifulSoup as soup
 class GetRSS:
-    print('tes');
+    print('Imported script successfully.');
     def __init__(self):
         self.alchemyObject = AlchemyAPI.AlchemyAPI()
         self.alchemyObject.loadAPIKey("api_key.txt")
