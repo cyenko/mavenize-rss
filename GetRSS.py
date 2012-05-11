@@ -9,7 +9,7 @@ class GetRSS:
         #Provided a sample URL, in case you want to test it
         self.url = 'http://www.rottentomatoes.com/syndication/rss/top_news.xml'
         print('Script loaded sucessfully.')
-
+    
     def getPermaLinks(self,url):
         print('called helper method')
         req = urllib2.Request(url, headers={'User-Agent' : "Magic Browser"})
@@ -46,7 +46,7 @@ class GetRSS:
         state = rawState.findAll(text=True)[0].encode('ascii')
         print('the type is ' + state)
 
-        if not (state == 'positive' or state == 'megative'):
+        if not (state == 'positive' or state == 'negative'):
             return -1 #what do I do when the state is neutral?
         else:
             rawScore = souped.findAll('score')[0]
