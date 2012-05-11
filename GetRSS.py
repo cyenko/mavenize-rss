@@ -37,13 +37,21 @@ class GetRSS:
         return self.alchemyObject.URLGetTitle(url)
 
     def getSummaryText(self,url):
-        pass
-    def getSentimentFromText(self, text):
+        pass #We want either the first or last paragraph
+    def getSentimentFromText(self, text):# Will feed this from output of the getLumpText function
         rawReturn =  self.alchemyObject.TextGetTextSentiment(text)
         souped = soup(rawReturn)
-        rawScore = souped.findAll('score')[0]
-        score = rawScore.findAll(text=True)[0].encode('ascii')
-        return float(score)#This returns a number -1.0 to 1.0
+        
+        rawState = souped.findAll('type')[0]
+        state = rawState.findAll(text=True)[0].encode('ascii')
+        print('the type is ' + state)
+
+        if not (state == 'positive' or state == 'megative'):
+            return -1 #what do I do when the state is neutral?
+        else:
+            rawScore = souped.findAll('score')[0]
+            score = rawScore.findAll(text=True)[0].encode('ascii')
+            return float(score)#This returns a number -1.0 to 1.0
         #We should base our rating system off the collective entirety of every review in our system
         #i.e. take an average of all the sentiment values, let rating of 3 be the mean value
         #rating of 4 to be one  quartile and above
