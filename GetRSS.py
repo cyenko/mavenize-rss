@@ -28,4 +28,30 @@ class GetRSS:
         #Should we leave in \n and \t marks, or no?
         print('Getting Lump Text');
         returnText = self.alchemyObject.URLGetText(url)
-        return returnText 
+        return returnText
+
+    def getAuthor(self, url):#Works for some, not for others.
+        return self.alchemyObject.URLGetAuthor(url)
+
+    def getMovieTitle(self,url):
+        return self.alchemyObject.URLGetTitle(url)
+
+    def getSummaryText(self,url):
+        pass
+    def getSentimentFromText(self, text):
+        rawReturn =  self.alchemyObject.TextGetTextSentiment(text)
+        souped = soup(rawReturn)
+        rawScore = souped.findAll('score')[0]
+        score = rawScore.findAll(text=True)[0].encode('ascii')
+        return float(score)#This returns a number -1.0 to 1.0
+        #We should base our rating system off the collective entirety of every review in our system
+        #i.e. take an average of all the sentiment values, let rating of 3 be the mean value
+        #rating of 4 to be one  quartile and above
+        #rating of 2 to be one quartile below
+
+
+    def getSentimentFromURL(self, url):
+        return self.alchemyObject.URLGetTextSentiment(url)
+
+    
+     
