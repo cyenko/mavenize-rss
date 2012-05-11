@@ -21,7 +21,7 @@ class GetRSS:
         if not unparsedList: #Some RSS pages use the 'link' tag rather than the 'guid' tag
             unparsedList = soupPage.findAll('link')
         for listelement in unparsedList:
-	        returnList.append(listelement.findAll(text=True))
+	        returnList.append(listelement.findAll(text=True)[0].encode('ascii'))
         return returnList
 
     def getLumpText(self,url): #We strip the navigation links and get only content.
