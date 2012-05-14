@@ -31,13 +31,18 @@ class GetRSS:
         return returnText
 
     def getAuthor(self, url):#Works for some, not for others.
-        return self.alchemyObject.URLGetAuthor(url)
+        rawReturn =  self.alchemyObject.URLGetAuthor(url)
+        souped = soup(rawReturn)
+        rawAuthor = souped.findAll('author')[0]
+        return rawAuthor.findAll(text=True)[0].encode('ascii')
 
-    def getMovieTitle(self,url):
-        return self.alchemyObject.URLGetTitle(url)
+    def getMovieTitle(self,text):
+        rawEntities = alchemyObject.TextGetRankedNamedEntities(text)
+        return rawEntities
 
     def getSummaryText(self,url):
         pass #We want either the first or last paragraph
+
     def getSentimentFromText(self, text):# Will feed this from output of the getLumpText function
         rawReturn =  self.alchemyObject.TextGetTextSentiment(text)
         souped = soup(rawReturn)
@@ -56,10 +61,6 @@ class GetRSS:
         #i.e. take an average of all the sentiment values, let rating of 3 be the mean value
         #rating of 4 to be one  quartile and above
         #rating of 2 to be one quartile below
-
-
-    def getSentimentFromURL(self, url):
-        return self.alchemyObject.URLGetTextSentiment(url)
 
     
      
