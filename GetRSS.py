@@ -63,7 +63,3 @@ class GetRSS:
         #rating of 2 to be one quartile below
 
     
-    def getRottenTomatoesReviews(self, movieName, movieYear)
-        pass
-        # returns an array of dictionaries, where each dictionary is one review
-        # have done by wednesday meeting
