@@ -62,4 +62,7 @@ class GetRSS:
         #rating of 4 to be one  quartile and above
         #rating of 2 to be one quartile below
 
-    
+    def getFirstParagraph(self, url):
+        return self.alchemyObject.URLGetConstraintQuery(url, 'first paragraph')
+        #I'm thinking it is more reliable to change it to last paragraph
+

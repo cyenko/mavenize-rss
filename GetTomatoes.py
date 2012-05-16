@@ -1,5 +1,6 @@
 import urllib2, json, AlchemyAPI
 import urllib as urllib
+import GetRSS
 class GetTomatoes:
     print('Imported GetTomatoes successfully.')
     def __init__(self,apikey=''):
@@ -11,6 +12,7 @@ class GetTomatoes:
         self.BASE = BASE
         self.movieURL=BASE+'movies.json'
         self.listsURL=BASE+'lists.json'
+        self.GetRSS = GetRSS.GetRSS()
     def getReviews(self, movieName, movieYear):
         movieSearchURL=self.movieURL+'?'+urllib.urlencode({'apikey':self.KEY, 'q': movieName})
         movieData = json.loads(urllib2.urlopen(movieSearchURL).read())
@@ -33,7 +35,33 @@ class GetTomatoes:
         print(reviewSearchURL)
         reviewData=json.loads(urllib2.urlopen(reviewSearchURL).read())
         reviewData = reviewData['reviews']
-        return reviewData
+        returnList=[]
+        for review in reviewData:
+            #Introduce error catching later
+            author=review['critic']
+            date=review['date']
+            link=review['links']['review'] 
+            text=self.GetRSS.getFirstParagraph(link)
+            try:
+                score=review['original_score']
+            except:
+               # score=-1 #If there is no original score, we take the sentiment and assign a score
+                sentiment=self.GetRSS.getSentimentFromText(text)
+                if sentiment < -.2:
+                    score = 1 #Arbitrary score assignments - will have to test for accuracy later
+                elif sentiment < 0:
+                    score = 2
+                elif sentiment < .1:
+                    score = 3
+                else:
+                    score = 4
+                if sentiment == -1:
+                    score= -1 #what t odo when the sentiment is neutral
+
+            reviewDictionary={'name':author,'rating':score,'text':text,'url':link,'date':date}
+            returnList.append(reviewDictionary)
+
+        return returnList
         #Create the dictionary of each review with the following properties
         #reviewer name, rating, text (Get first paragraph, url, date
 
