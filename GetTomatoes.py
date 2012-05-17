@@ -14,10 +14,18 @@ class GetTomatoes:
         self.movieURL=BASE+'movies.json'
         self.listsURL=BASE+'lists.json'
         self.GetRSS = GetRSS.GetRSS()
+
+    def debugGetMovieList(self,movieName,movieYear):#Will remove before final version
+        movieSearchURL=self.movieURL+'?'+urllib.urlencode({'apikey':self.KEY, 'q': movieName})
+        movieData = json.loads(urllib2.urlopen(movieSearchURL).read())
+        movieData = movieData['movies']
+        return movieData
+
     def getReviews(self, movieName, movieYear):
         movieSearchURL=self.movieURL+'?'+urllib.urlencode({'apikey':self.KEY, 'q': movieName})
         movieData = json.loads(urllib2.urlopen(movieSearchURL).read())
         movieData = movieData['movies']
+        
         #We need to find the right movie now, because we don't want to just take the 1st result
         #  Filter by year.
         correctMovieID=-1
@@ -30,7 +38,12 @@ class GetTomatoes:
         if correctMovieID==-1:
             print('error - cannot find movie')
             #throw exception here
+        #Get IMDB id - ask sameen what this is for again
+        movieIMDBNum=correctMovie['alternate_ids']['imdb']
+        print('IMDB ID is '+ movieIMDBNum)
         print(movieSearchURL)
+        #This part is also prone to errors.  How can we catch errors where the user's request
+        #times out?
         reviewSearchURL=self.BASE+'movies/'+correctMovieID+'/reviews.json?'
         reviewSearchURL = reviewSearchURL +urllib.urlencode({'apikey':self.KEY})
         print(reviewSearchURL)
@@ -44,11 +57,14 @@ class GetTomatoes:
             date=review['date']
             link=review['links']['review']
             try:
-                text=self.GetRSS.getFirstParagraph(link)
-            except:
+                text=self.GetRSS.getFirstParagraph(link) #Once tihs is fixed, it will work
+            except: #Comment this out to see the error from AlchemyAPI
                 text='N/A'
             try:
                 score=review['original_score']
+                #This score is either in number format
+                # or a letter grade with + or - (i.e. A-)
+                #
             except:
                # score=-1 #If there is no original score, we take the sentiment and assign a score
                 if not text=='N/A':
@@ -62,7 +78,7 @@ class GetTomatoes:
                     else:
                         score = 4
                     if sentiment == -1:
-                        score= -1 #what t odo when the sentiment is neutral
+                        score= -1 #what to do when the sentiment is neutral
                 else:
                     score=-1
 

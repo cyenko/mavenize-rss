@@ -63,11 +63,12 @@ class GetRSS:
         #rating of 2 to be one quartile below
 
     def getFirstParagraph(self, url):
-        rawReturn = self.alchemyObject.URLGetConstraintQuery(url, 'first paragraph')
+        rawReturn = self.alchemyObject.URLGetConstraintQuery(url, 'text')
+        
         souped = soup(rawReturn)
         text = souped.findAll('resulttext')
         if len(text) > 1:
-            #Do something to figure out which is the right summary text
+            pass #Do something to figure out which is the right summary text
         else:
             returnParagraph=text[0].findAll(text=True).encode('ascii')
         return returnParagraph
