@@ -67,8 +67,10 @@ class GetRSS:
         return souped
     def getP(self,url):
         rawReturn = self.alchemyObject.URLGetText(url)
+        rawReturn = rawReturn.replace('\t','')
+        rawReturn = rawReturn.replace('  ',' ')
         souped = soup(rawReturn)
         text = souped.findAll('text')
-        returnText =  text[0].findAll(text=True)[0].encode('ascii')
+        returnText =  text[0].findAll(text=True)[0].encode('ascii','ignore')
         returnText = returnText.replace('\n\n','')
         return returnText
