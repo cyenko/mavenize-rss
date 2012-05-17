@@ -62,7 +62,7 @@ class GetTomatoes:
             date=review['date']
             link=review['links']['review']
             try:
-                text=self.GetRSS.getFirstParagraph(link) #Once tihs is fixed, it will work
+                text=self.GetRSS.getP(link) #Once tihs is fixed, it will work
             except: #Comment this out to see the error from AlchemyAPI
                 text='N/A'
             try:
@@ -99,7 +99,8 @@ class GetTomatoes:
                     #This should be a red flag for the database to NOT import this review
 
             #Package the review in a dictionary and stick it in the return array
-            reviewDictionary={'name':author,'rating':score,'text':text,'url':link,'date':date}
-            returnList.append(reviewDictionary)
+            if not (score==-1 and text=='N/A'):
+                reviewDictionary={'name':author,'rating':score,'text':text,'url':link,'date':date}
+                returnList.append(reviewDictionary)
 
         return returnList
