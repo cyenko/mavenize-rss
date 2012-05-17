@@ -21,6 +21,9 @@ class GetTomatoes:
         movieData = movieData['movies']
         return movieData
 
+    #Create the dictionary of each review with the following properties:
+    #reviewer name, rating, summary text, url, date
+    #(returnReviews[]) = getReviews(String movieName, int movieYear)
     def getReviews(self, movieName, movieYear):
         movieSearchURL=self.movieURL+'?'+urllib.urlencode({'apikey':self.KEY, 'q': movieName})
         movieData = json.loads(urllib2.urlopen(movieSearchURL).read())
@@ -29,26 +32,28 @@ class GetTomatoes:
         #We need to find the right movie now, because we don't want to just take the 1st result
         #  Filter by year.
         correctMovieID=-1
-        correctMovie={}#REMOVE LATER, FOR DEBUGGING PURPOSES
+        correctMovie={}
         for movie in movieData:
             if movie['year'] == movieYear:
                 correctMovieID=movie['id']
                 correctMovie=movie
                 break
         if correctMovieID==-1:
-            print('error - cannot find movie')
-            #throw exception here
+            raise Exception('Error: Cannot find movie with that year and name.')
+        
         #Get IMDB id - ask sameen what this is for again
         movieIMDBNum=correctMovie['alternate_ids']['imdb']
         print('IMDB ID is '+ movieIMDBNum)
-        print(movieSearchURL)
-        #This part is also prone to errors.  How can we catch errors where the user's request
-        #times out?
+        
+        #Get all the reviews written
         reviewSearchURL=self.BASE+'movies/'+correctMovieID+'/reviews.json?'
         reviewSearchURL = reviewSearchURL +urllib.urlencode({'apikey':self.KEY})
-        print(reviewSearchURL)
         reviewData=json.loads(urllib2.urlopen(reviewSearchURL).read())
         reviewData = reviewData['reviews']
+        #reviewData is list of reviews for the movie found
+
+
+        #We need to take data from each list in put it into a format we like.
         self.debugReviewList = reviewData
         returnList=[]
         for review in reviewData:
@@ -62,12 +67,23 @@ class GetTomatoes:
                 text='N/A'
             try:
                 score=review['original_score']
-                #This score is either in number format
-                # or a letter grade with + or - (i.e. A-)
-                #
+                try: #Score is is number format
+                    score = int(round(score))
+                except: #Score is in letter format
+                    #Get the first letter, and assign a score based on that.
+                    letter = score[0]
+                    if letter == 'A':
+                        score = 4
+                    elif letter == 'B':
+                        score = 3
+                    elif letter == 'C':
+                        score = 2
+                    else:
+                        score = 1
             except:
                # score=-1 #If there is no original score, we take the sentiment and assign a score
                 if not text=='N/A':
+                    print('Called sentiment analysis')
                     sentiment=self.GetRSS.getSentimentFromText(text)
                     if sentiment < -.2:
                         score = 1 #Arbitrary score assignments - will have to test for accuracy later
@@ -77,17 +93,13 @@ class GetTomatoes:
                         score = 3
                     else:
                         score = 4
-                    if sentiment == -1:
-                        score= -1 #what to do when the sentiment is neutral
+                    
                 else:
-                    score=-1
+                    score=-1 #If there is no original score and no text, we automatically assign -1
+                    #This should be a red flag for the database to NOT import this review
 
+            #Package the review in a dictionary and stick it in the return array
             reviewDictionary={'name':author,'rating':score,'text':text,'url':link,'date':date}
             returnList.append(reviewDictionary)
 
         return returnList
-        #Create the dictionary of each review with the following properties
-        #reviewer name, rating, text (Get first paragraph, url, date
-
-        # returns an array of dictionaries, where each dictionary is one review
-        # have done by wednesday meeting

@@ -52,7 +52,7 @@ class GetRSS:
         print('the type is ' + state)
 
         if not (state == 'positive' or state == 'negative'):
-            return -1 #what do I do when the state is neutral?
+            return 0 #what do I do when the state is neutral?
         else:
             rawScore = souped.findAll('score')[0]
             score = rawScore.findAll(text=True)[0].encode('ascii')
