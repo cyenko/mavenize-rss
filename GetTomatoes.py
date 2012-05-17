@@ -3,6 +3,7 @@ import urllib as urllib
 import GetRSS
 class GetTomatoes:
     print('Imported GetTomatoes successfully.')
+    debugReviewList = [];
     def __init__(self,apikey=''):
         if apikey == '':
             self.KEY='mz7z7f9zm79tc3hcaw3xb85w'
@@ -35,28 +36,35 @@ class GetTomatoes:
         print(reviewSearchURL)
         reviewData=json.loads(urllib2.urlopen(reviewSearchURL).read())
         reviewData = reviewData['reviews']
+        self.debugReviewList = reviewData
         returnList=[]
         for review in reviewData:
             #Introduce error catching later
             author=review['critic']
             date=review['date']
-            link=review['links']['review'] 
-            text=self.GetRSS.getFirstParagraph(link)
+            link=review['links']['review']
+            try:
+                text=self.GetRSS.getFirstParagraph(link)
+            except:
+                text='N/A'
             try:
                 score=review['original_score']
             except:
                # score=-1 #If there is no original score, we take the sentiment and assign a score
-                sentiment=self.GetRSS.getSentimentFromText(text)
-                if sentiment < -.2:
-                    score = 1 #Arbitrary score assignments - will have to test for accuracy later
-                elif sentiment < 0:
-                    score = 2
-                elif sentiment < .1:
-                    score = 3
+                if not text=='N/A':
+                    sentiment=self.GetRSS.getSentimentFromText(text)
+                    if sentiment < -.2:
+                        score = 1 #Arbitrary score assignments - will have to test for accuracy later
+                    elif sentiment < 0:
+                        score = 2
+                    elif sentiment < .1:
+                        score = 3
+                    else:
+                        score = 4
+                    if sentiment == -1:
+                        score= -1 #what t odo when the sentiment is neutral
                 else:
-                    score = 4
-                if sentiment == -1:
-                    score= -1 #what t odo when the sentiment is neutral
+                    score=-1
 
             reviewDictionary={'name':author,'rating':score,'text':text,'url':link,'date':date}
             returnList.append(reviewDictionary)
