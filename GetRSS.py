@@ -71,6 +71,16 @@ class GetRSS:
         rawReturn = rawReturn.replace('  ',' ')
         souped = soup(rawReturn)
         text = souped.findAll('text')
-        returnText =  text[0].findAll(text=True)[0].encode('ascii','ignore')
-        returnText = returnText.replace('\n\n','')
-        return returnText
+        strippedText =  text[0].findAll(text=True)[0].encode('ascii','ignore')
+        occurances = self.getOccurances(strippedText)
+        startIndex = occurances[len(occurances) - 3]
+        summary = strippedText[startIndex:]
+        summary = summary.replace('\n','')
+       # summary = summary.replace('\'',"") #I assume you don't want to get rid
+       # of this type of grammar
+        return summary
+
+    def getOccurances(self,text):
+         return [match.start() for match in re.finditer(re.escape("\n"), text)]
+        
+
